@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claridad Urbana - Housing Justice Data Hub</title>
+    <!-- CSS -->
+    <link rel="stylesheet" href="style.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="housing_logo_Untitled-removebg-preview.png" alt="Claridad Urbana Logo" class="logo">
+                <h1 class="app-title-sidebar">Claridad Urbana</h1>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li><a href="#" class="nav-link active" data-section="dashboard"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a></li>
+                    <li><a href="#" class="nav-link" data-section="visualizations"><i class="fas fa-chart-bar"></i> <span>Visualizations</span></a></li>
+                    <li><a href="#" class="nav-link" data-section="reports"><i class="fas fa-file-alt"></i> <span>Reports</span></a></li>
+                    <li><a href="#" class="nav-link" data-section="voices"><i class="fas fa-bullhorn"></i> <span>Community Voices</span></a></li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <button id="logout-btn" class="btn btn-secondary"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></button>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Dashboard Section -->
+            <section id="dashboard" class="content-section active">
+                <div class="section-header">
+                    <h2>Dashboard</h2>
+                    <p>Analyze housing trends across Mexico City's alcaldías.</p>
+                </div>
+                <div class="map-container" id="map-container">
+                    <div id="map"></div>
+                    <div class="map-controls">
+                        <label for="year-slider">Year: <span id="year-label">2025</span></label>
+                        <input type="range" id="year-slider" min="2022" max="2025" value="2025">
+                    </div>
+                </div>
+            </section>
+
+            <!-- Visualizations Section -->
+            <section id="visualizations" class="content-section">
+                <div class="section-header">
+                    <h2>Data Visualizations</h2>
+                    <p>Explore detailed trends with interactive charts and tables.</p>
+                </div>
+                <div class="vis-controls">
+                    <div class="form-group">
+                        <label for="vis-year-select">Select Year</label>
+                        <select id="vis-year-select">
+                            <option value="2022">2022</option>
+                            <option value="2023">2023</option>
+                            <option value="2024">2024</option>
+                            <option value="2025" selected>2025</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="stats-grid">
+                    <div class="chart-card">
+                        <h3>Average Rent by Alcaldía (MXN)</h3>
+                        <canvas id="rent-chart"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Airbnb Listings Growth</h3>
+                        <canvas id="airbnb-chart"></canvas>
+                    </div>
+                    <div class="chart-card full-width">
+                        <h3>Rent vs. Airbnb Listings (<span class="dynamic-year">2025</span>)</h3>
+                        <canvas id="scatter-chart"></canvas>
+                    </div>
+                    <div class="chart-card full-width">
+                        <h3>Heatmap of Displacement Risk (<span class="dynamic-year">2025</span>)</h3>
+                        <div id="heatmap-vis" class="heatmap-container"></div>
+                    </div>
+                    <div class="chart-card full-width">
+                         <h3>Detailed Statistics Table (<span class="dynamic-year">2025</span>)</h3>
+                         <div id="stats-table-container">
+                            <!-- Table will be generated by JS -->
+                         </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Reports Section -->
+            <section id="reports" class="content-section">
+                <div class="section-header">
+                    <h2>Reports</h2>
+                    <p>Create shareable PDF reports from the data.</p>
+                </div>
+                <div class="report-generator-card">
+                    <h3>Report Configuration</h3>
+                    <div class="form-group">
+                        <label for="report-neighborhood">Select Alcaldía(s) (Ctrl/Cmd + Click for multiple)</label>
+                        <select id="report-neighborhood" multiple size="8">
+                            <!-- Options populated by JS -->
+                        </select>
+                    </div>
+                     <div class="form-group">
+                        <label>Select Year(s)</label>
+                        <div class="checkbox-group">
+                            <label><input type="checkbox" name="report-year" value="2022"> 2022</label>
+                            <label><input type="checkbox" name="report-year" value="2023"> 2023</label>
+                            <label><input type="checkbox" name="report-year" value="2024"> 2024</label>
+                            <label><input type="checkbox" name="report-year" value="2025" checked> 2025</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Data to Include</label>
+                        <div class="checkbox-group">
+                            <label><input type="checkbox" name="report-data" value="avg_rent_mxn" checked> Avg. Rent</label>
+                            <label><input type="checkbox" name="report-data" value="airbnb_listings" checked> Airbnb Listings</label>
+                            <label><input type="checkbox" name="report-data" value="displacement_risk" checked> Displacement Risk</label>
+                            <label><input type="checkbox" name="report-data" value="eviction_notices" checked> Eviction Notices</label>
+                        </div>
+                    </div>
+                    <button id="generate-pdf-btn" class="btn btn-primary"><i class="fas fa-download"></i> Download Report (PDF)</button>
+                </div>
+            </section>
+
+            <!-- Community Voices Section -->
+            <section id="voices" class="content-section">
+                <div class="section-header">
+                    <h2>Community Voices</h2>
+                    <p>Share and read stories from residents.</p>
+                </div>
+                <div class="voices-layout">
+                    <div class="story-form-card">
+                        <h3>Share Your Story</h3>
+                        <form id="story-form">
+                            <div class="form-group">
+                                <label for="story-name">Your Name</label>
+                                <input type="text" id="story-name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="story-neighborhood">Your Alcaldía</label>
+                                <select id="story-neighborhood" required>
+                                    <!-- Options will be populated by JS -->
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="story-text">Your Story</label>
+                                <textarea id="story-text" rows="6" required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Submit Story</button>
+                        </form>
+                    </div>
+                    <div class="story-display">
+                        <h3>Recent Stories</h3>
+                        <div id="story-list" class="story-list">
+                            <!-- Stories will be populated by JS -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- JavaScript Libraries -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet.heat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <!-- App Data and Logic -->
+    <script src="data.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
