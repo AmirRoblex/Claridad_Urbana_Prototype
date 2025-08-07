@@ -489,3 +489,27 @@ body {
     padding: 1rem;
   }
 }
+
+/* ADDED THIS SECTION */
+#north-arrow {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 1000;
+    width: 40px;
+    height: 40px;
+    background: white;
+    border: 2px solid #ccc;
+    border-radius: 50%;
+    box-shadow: 0 1px 5px rgba(0,0,0,0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+#north-arrow::before {
+    content: 'N';
+    color: #333;
+}
