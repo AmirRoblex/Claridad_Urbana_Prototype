@@ -34,6 +34,26 @@ document.addEventListener('DOMContentLoaded', () => {
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">'
         }).addTo(map);
 
+        // Load and add the alcaldías boundaries from the new JSON file
+        fetch('limite-de-las-alcaldas.json')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                L.geoJson(data, {
+                    style: {
+                        color: "#222",      // A dark color for the outline
+                        weight: 2,          // Line weight
+                        opacity: 0.7,       // Line opacity
+                        fillOpacity: 0.0    // No fill, so it's just a border
+                    }
+                }).addTo(map);
+            })
+            .catch(error => console.error('Error loading or parsing limite-de-las-alcaldas.json:', error));
+
         legend = L.control({ position: 'bottomright' });
         legend.onAdd = function () {
             const div = L.DomUtil.create('div', 'info legend');
